@@ -62,7 +62,7 @@ class DMC:
             
 class CQG:
     
-    def __init__(self, naive=False, friedman_value=0.3):
+    def __init__(self, naive=False, friedman_value=1):
         self.gaussians = None
         self.a_priori = None
         self.naive = naive
@@ -73,7 +73,7 @@ class CQG:
     
     def fit(self, X_train, Y_train):
         cd = utils.to_class_dict(X_train, Y_train)
-        self.gaussians = [utils.Gaussian(cd[y], self.naive) for y in sorted(cd)]
+        self.gaussians = [utils.Gaussian(cd[y], self.naive) for y in sorted(cd.keys())]
         
         if any([g.singular() for g in self.gaussians]):
             utils.apply_friedman(self.gaussians, self.friedman_value)

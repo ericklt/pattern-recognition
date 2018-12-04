@@ -38,16 +38,20 @@ class Gaussian:
         self.update_cov(c)
         
     def singular(self):
-        return np.linalg.matrix_rank(self.cov) != self.cov.shape[0]
+        return np.linalg.matrix_rank(self.cov) != self.cov.shape[0] or np.linalg.cond(self.cov) > 30
         
     def update_cov(self, cov):
         self.cov = cov
         self.cov_inv = np.linalg.pinv(cov)
         self.cov_det = np.linalg.det(cov)
+        self.log_det = np.log(self.cov_det)
+        
+    def __mahalanobis(self, x):
+        z = x - self.mean
+        return np.dot(z, np.dot(self.cov_inv, z))
         
     def log_prob(self, x):
-        z = x - self.mean
-        return - 0.5 * (np.dot(z, np.dot(self.cov_inv, z)) + np.log(self.cov_det))
+        return - 0.5 * (self.__mahalanobis(x) + self.log_det)
 
 class Transformer:
     
